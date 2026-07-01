@@ -3,265 +3,701 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>E-commerce Behavior — Cole Vatnsdal</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@sgratzl/chartjs-chart-boxplot@4.4.4/build/index.umd.min.js"></script>
+<title>NBA Statistics, 2005&ndash;2021 &middot; Cole Vatnsdal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.32.0/plotly.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#f7f6f2;--surface:#fff;--ink:#1a1a1a;--muted:#6b6b6b;--accent:#2c5f8a;--rule:#d8d5ce}
-body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',sans-serif;font-weight:300;line-height:1.7}
-header{background:var(--accent);color:#fff;padding:4rem 2rem 3rem;text-align:center}
-header h1{font-family:'IBM Plex Serif',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:600;letter-spacing:-0.02em;margin-bottom:.4rem}
-header .byline{font-family:'IBM Plex Mono',monospace;font-size:.85rem;opacity:.75;letter-spacing:.08em;text-transform:uppercase}
-.intro{max-width:760px;margin:3rem auto;padding:0 2rem 0 1.5rem;font-size:1.05rem;color:var(--muted);border-left:3px solid var(--accent)}
-.section-label{font-family:'IBM Plex Mono',monospace;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin:3rem auto 1rem;max-width:1200px;padding:0 1.5rem}
-.charts-grid{max-width:1200px;margin:0 auto;padding:0 1.5rem 4rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(560px,1fr));gap:2.5rem}
-.chart-card{background:var(--surface);border:1px solid var(--rule);border-radius:4px;padding:2rem 2rem 1.5rem}
-.chart-card h2{font-family:'IBM Plex Serif',serif;font-size:1rem;font-weight:600;margin-bottom:.25rem;color:var(--ink)}
-.chart-card .sub{font-size:.78rem;color:var(--muted);margin-bottom:1.25rem;font-family:'IBM Plex Mono',monospace}
-.chart-card .chart-wrap{position:relative;width:100%}
-.writeup{max-width:760px;margin:0 auto 5rem;padding:0 2rem}
-.writeup h2{font-family:'IBM Plex Serif',serif;font-size:1.6rem;font-weight:600;margin-bottom:2rem;padding-bottom:.75rem;border-bottom:2px solid var(--accent)}
-.writeup p{margin-bottom:1.2rem;font-size:1rem;color:#333}
+  :root{
+    --paper:#f3f1ea;
+    --paper-2:#eae7dc;
+    --ink:#14181f;
+    --ink-soft:#4a5160;
+    --line:#d8d3c4;
+    --guard:#1d7ab5;
+    --forward:#e07b39;
+    --center:#3aaa6e;
+    --navy:#0f2740;
+    --max-w:1080px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Source Sans 3",system-ui,sans-serif;
+    line-height:1.55;
+  }
+  ::selection{background:var(--guard); color:#fff;}
+
+  h1,h2,h3,.display{
+    font-family:"Oswald",system-ui,sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+    color:var(--navy);
+  }
+  .mono{font-family:"IBM Plex Mono",monospace;}
+
+  a{color:var(--guard);}
+
+  /* ---------- Header / Scoreboard ---------- */
+  header.hero{
+    background:
+      linear-gradient(180deg, var(--navy) 0%, #163454 100%);
+    color:#f3f1ea;
+    padding:64px 24px 0;
+    position:relative;
+    overflow:hidden;
+  }
+  header.hero::after{
+    content:"";
+    position:absolute;
+    inset:auto 0 0 0;
+    height:6px;
+    background:repeating-linear-gradient(
+      90deg,
+      var(--guard) 0 40px,
+      var(--forward) 40px 80px,
+      var(--center) 80px 120px
+    );
+  }
+  .hero-inner{max-width:var(--max-w); margin:0 auto; padding-bottom:40px;}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:#9db6cc;
+    margin:0 0 14px;
+  }
+  header.hero h1{
+    color:#fff;
+    font-size:clamp(34px,6vw,58px);
+    line-height:1.03;
+    margin:0 0 6px;
+    font-weight:700;
+  }
+  header.hero .byline{
+    font-size:15px;
+    color:#c7d2de;
+    margin:0 0 34px;
+  }
+  header.hero .byline strong{color:#fff; font-weight:600;}
+  .scoreboard{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:1px;
+    background:rgba(255,255,255,0.14);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .stat-cell{
+    background:#132d49;
+    padding:18px 16px 16px;
+  }
+  .stat-cell .num{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:clamp(22px,3vw,30px);
+    font-weight:600;
+    color:#fff;
+  }
+  .stat-cell .lbl{
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:#8fa7bd;
+    margin-top:4px;
+  }
+
+  /* ---------- Nav ---------- */
+  nav.toc{
+    position:sticky; top:0; z-index:20;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  nav.toc .toc-inner{
+    max-width:var(--max-w); margin:0 auto;
+    padding:10px 24px;
+    display:flex; gap:22px;
+    overflow-x:auto;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;
+    letter-spacing:0.03em;
+  }
+  nav.toc a{
+    color:var(--ink-soft);
+    text-decoration:none;
+    white-space:nowrap;
+    padding:4px 0;
+    border-bottom:2px solid transparent;
+  }
+  nav.toc a:hover{color:var(--navy); border-color:var(--guard);}
+
+  /* ---------- Layout ---------- */
+  main{max-width:var(--max-w); margin:0 auto; padding:0 24px;}
+  .intro{
+    padding:40px 0 8px;
+    max-width:760px;
+    color:var(--ink-soft);
+    font-size:16px;
+  }
+  .intro p{margin:0 0 14px;}
+  .intro .note{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12.5px;
+    color:#6b7280;
+    border-left:3px solid var(--line);
+    padding-left:12px;
+    margin-top:20px;
+  }
+
+  section.q{
+    padding:56px 0 44px;
+    border-top:1px solid var(--line);
+  }
+  section.q .tag{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;
+    color:var(--guard);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin:0 0 6px;
+    display:flex; align-items:center; gap:10px;
+  }
+  section.q .tag .idx{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:26px; height:26px;
+    background:var(--navy); color:#fff;
+    border-radius:2px;
+    font-weight:600;
+  }
+  section.q h2{
+    font-size:clamp(22px,3vw,30px);
+    margin:0 0 22px;
+    font-weight:600;
+  }
+
+  .panel-grid{
+    display:grid;
+    gap:18px;
+    margin-bottom:22px;
+  }
+  .grid-1{grid-template-columns:1fr;}
+  .grid-2{grid-template-columns:1fr 1fr;}
+  .grid-left-narrow{grid-template-columns:0.9fr 1.1fr;}
+  @media (max-width:760px){
+    .grid-2, .grid-left-narrow{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:#fffdf8;
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:14px 14px 6px;
+  }
+  .panel .panel-title{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 4px;
+    display:flex; justify-content:space-between; align-items:baseline;
+  }
+  .panel .plot{width:100%;}
+
+  .stack{display:flex; flex-direction:column; gap:18px;}
+
+  .finding{
+    background:var(--paper-2);
+    border-left:4px solid var(--guard);
+    padding:16px 20px;
+    font-size:15.5px;
+    color:#20242c;
+    border-radius:0 3px 3px 0;
+  }
+  .finding strong{color:var(--navy);}
+
+  .legend-row{
+    display:flex; gap:16px; flex-wrap:wrap;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  .legend-row span{display:inline-flex; align-items:center; gap:6px;}
+  .swatch{width:10px; height:10px; border-radius:2px; display:inline-block;}
+
+  footer{
+    padding:40px 24px 60px;
+    text-align:center;
+    color:#8b8676;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:12px;
+    border-top:1px solid var(--line);
+    margin-top:20px;
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>E-commerce Behavior</h1>
-  <p class="byline">Cole Vatnsdal</p>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Statistics &middot; Data Visualization Project</p>
+    <h1>NBA Statistics</h1>
+    <p class="byline">By <strong>Cole Vatnsdal</strong> &nbsp;&middot;&nbsp; Seasons 2005&ndash;06 through 2021&ndash;22</p>
+    <div class="scoreboard" id="scoreboard"></div>
+  </div>
 </header>
 
-<p class="intro">The dataset <em>E-commerce Customer Behavior.csv</em> provides descriptive statistics on customer behavior. The data measure gender, quantity, satisfaction, total spend, and customers' ages. There are 350 total observations. 2 of the observations contained NA for the satisfaction level. These observations were filtered out of the charts which showed satisfaction. The purpose of this exercise is to use various visuals to model the data for an e-commerce site.</p>
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#intro">Intro</a>
+    <a href="#longevity">01 Career Longevity</a>
+    <a href="#age">02 Age &amp; Performance</a>
+    <a href="#scoring">03 Scoring Trends</a>
+    <a href="#rookies">04 Rookie Impact</a>
+    <a href="#positional">05 Positional Analysis</a>
+    <a href="#efficiency">06 Player Efficiency</a>
+    <a href="#international">07 International Impact</a>
+  </div>
+</nav>
 
-<p class="section-label">Visualizations</p>
-<div class="charts-grid">
-  <div class="chart-card"><h2>Distribution of Total Spend by Membership Type</h2><div class="sub">Box plot — median, IQR, and range</div><div class="chart-wrap"><canvas id="c1" height="380"></canvas></div></div>
-  <div class="chart-card"><h2>Total Spend by Age Group</h2><div class="sub">38–43 group has narrow spread by nature of the data</div><div class="chart-wrap"><canvas id="c2" height="380"></canvas></div></div>
-  <div class="chart-card"><h2>Items Purchased vs. Total Spend</h2><div class="sub">r = 0.972 — strong positive correlation</div><div class="chart-wrap"><canvas id="c3" height="360"></canvas></div></div>
-  <div class="chart-card"><h2>Average Customer Rating by City</h2><div class="sub">Bar chart sorted highest to lowest</div><div class="chart-wrap"><canvas id="c4" height="360"></canvas></div></div>
-  <div class="chart-card"><h2>Days Since Last Purchase vs. Total Spend</h2><div class="sub">r = −0.54 — moderate negative correlation</div><div class="chart-wrap"><canvas id="c5" height="360"></canvas></div></div>
-  <div class="chart-card"><h2>Impact of Discount Application on Total Spend</h2><div class="sub">Box plot — discounted vs. non-discounted</div><div class="chart-wrap"><canvas id="c6" height="380"></canvas></div></div>
-  <div class="chart-card"><h2>Age Distribution by Membership Type</h2><div class="sub">Histogram — count per age year</div><div class="chart-wrap"><canvas id="c7" height="380"></canvas></div></div>
-  <div class="chart-card"><h2>Customer Satisfaction Level vs. Total Spend</h2><div class="sub">r = 0.797 — strong positive correlation</div><div class="chart-wrap"><canvas id="c8" height="360"></canvas></div></div>
-  <div class="chart-card"><h2>Spending Patterns by Gender</h2><div class="sub">Box plot — Female vs. Male</div><div class="chart-wrap"><canvas id="c9" height="380"></canvas></div></div>
-  <div class="chart-card"><h2>Number of Items Purchased by City</h2><div class="sub">Box plot sorted by median</div><div class="chart-wrap"><canvas id="c10" height="420"></canvas></div></div>
-</div>
+<main>
+  <div class="intro" id="intro">
+    <p>The dataset <span class="mono">all_seasons</span> contains NBA player statistics from 1996 through 2023. Per the project requirements, this analysis is restricted to seasons <strong>2005&ndash;06 through 2021&ndash;22</strong>. Within that window are statistics such as position, points, rebounds, assists, and net rating.</p>
+    <p>Position is derived from player height (Guard &lt;196cm, Forward 196&ndash;210cm, Center &gt;210cm). The purpose of this project is to use visualization to surface statistical trends in the NBA over this period.</p>
+    <p class="note">All charts below are rendered client-side from the original all_seasons.csv dataset &mdash; the same source data and aggregation logic used in the R analysis.</p>
+  </div>
 
-<p class="section-label">Write-up</p>
-<div class="writeup">
-  <h2>Analysis</h2>
-  <p>The bronze membership has the lowest variation, along with the lowest average. The gold membership has the highest variation, along with the highest average. The silver membership is in the middle for both variation and median. The Gold membership has a median near its own 25th percentile, which indicates that there are high outliers. The Silver membership median is near its 75th percentile, which indicates that there are low outliers.</p>
-  <p>There is a strong positive correlation between items purchased and total spend, as shown by the r = 0.972.</p>
-  <p>San Francisco has the highest mean customer rating, while Houston has the lowest. New York and Los Angeles also have mean scores above 4, while Miami and Chicago have scores below 4.</p>
-  <p>There is a relatively weak negative correlation of −0.54 between days since last purchase and total spend.</p>
-  <p>With no discount, the variation of total spend is higher, along with a slightly higher mean spend. With a discount, the mean is slightly lower, and so is the variation.</p>
-  <p>The bronze membership shows values between 34 and 43 years old with a gap between 38 and 40. The gold membership is relatively unimodal and centered at 30 years old, with a distribution between 28 and 34 years old. The silver membership shows a bimodal distribution between 25 and 36 years old.</p>
-  <p>There is a relatively strong positive correlation between customer satisfaction level and total spending, as shown by the r = 0.797.</p>
-  <p>In general, women spend less than men on this site. The variations are relatively similar, and both medians are close to their 25th percentiles. This indicates that the spending variations are relatively similar across the two genders; however, males spend more on average.</p>
-  <p>The cities with high satisfaction scores also have higher total quantities. Miami has a higher mean than Los Angeles, Chicago, and Houston, but the variation is significantly large, which means the order can fluctuate for Miami and Los Angeles depending on the observation.</p>
-</div>
+  <!-- 1. CAREER LONGEVITY -->
+  <section class="q" id="longevity">
+    <p class="tag"><span class="idx">01</span>Career Longevity</p>
+    <h2>What is the average career length, and does it differ by position?</h2>
+
+    <div class="legend-row">
+      <span><i class="swatch" style="background:var(--guard)"></i>Guard</span>
+      <span><i class="swatch" style="background:var(--forward)"></i>Forward</span>
+      <span><i class="swatch" style="background:var(--center)"></i>Center</span>
+    </div>
+
+    <div class="panel-grid grid-left-narrow">
+      <div class="panel">
+        <p class="panel-title">Career Length Distribution</p>
+        <div id="p1-hist-guard" class="plot"></div>
+        <div id="p1-hist-forward" class="plot"></div>
+        <div id="p1-hist-center" class="plot"></div>
+      </div>
+      <div class="stack">
+        <div class="panel">
+          <p class="panel-title">Avg Career Length by Position</p>
+          <div id="p1-avg" class="plot"></div>
+        </div>
+        <div class="panel">
+          <p class="panel-title">Longest NBA Careers</p>
+          <div id="p1-longest" class="plot"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="finding">While the average career length for centers is longer, <strong>8 of the top 14</strong> players who had the longest careers were played by forwards. Guards had both the lowest average career as well as the fewest positions with the longest careers.</div>
+  </section>
+
+  <!-- 2. AGE & PERFORMANCE -->
+  <section class="q" id="age">
+    <p class="tag"><span class="idx">02</span>Age &amp; Performance</p>
+    <h2>How does performance change with age, and who excelled late?</h2>
+
+    <div class="panel-grid grid-1">
+      <div class="panel">
+        <p class="panel-title">Average NBA Performance by Player Age</p>
+        <div id="p2-age" class="plot"></div>
+      </div>
+      <div class="panel">
+        <p class="panel-title">Players Who Excelled After Age 35 &nbsp;<span style="font-weight:400;text-transform:none;">(min 25 GP &amp; 15 pts/game)</span></p>
+        <div id="p2-late" class="plot"></div>
+      </div>
+    </div>
+
+    <div class="finding">In general, scoring increases as athletes begin their careers and peaks around <strong>age 28</strong>. After that, scoring declines overall &mdash; with exceptions. LeBron James averaged over 25 points per game past age 35. Rebounds and assists stay relatively stable, with a slight increase as athletes age.</div>
+  </section>
+
+  <!-- 3. SCORING TRENDS -->
+  <section class="q" id="scoring">
+    <p class="tag"><span class="idx">03</span>Scoring Trends</p>
+    <h2>Who were the top scorers each season, and is there a league-wide trend?</h2>
+
+    <div class="panel-grid grid-1">
+      <div class="panel">
+        <p class="panel-title">League-Wide Average Points per Game Over Time</p>
+        <div id="p3-league" class="plot"></div>
+      </div>
+      <div class="panel">
+        <p class="panel-title">Top Scorer Each Season</p>
+        <div id="p3-topscorer" class="plot"></div>
+      </div>
+      <div class="panel">
+        <p class="panel-title">Most Seasons as Top Scorer</p>
+        <div id="p3-count" class="plot"></div>
+      </div>
+    </div>
+
+    <div class="finding">League-wide scoring has not changed significantly over time &mdash; a small upward trend of almost 1 point per game. The <strong>top scorer</strong> each season, however, has increased by almost 4 points, led by Kevin Durant's four seasons atop the league.</div>
+  </section>
+
+  <!-- 4. ROOKIE IMPACT -->
+  <section class="q" id="rookies">
+    <p class="tag"><span class="idx">04</span>Rookie Impact</p>
+    <h2>How do rookies compare to prime and veteran players?</h2>
+
+    <div class="panel-grid grid-1">
+      <div class="panel">
+        <p class="panel-title">Average Performance by Career Stage</p>
+        <div id="p4-stage" class="plot"></div>
+      </div>
+      <div class="panel">
+        <p class="panel-title">Top Performing Rookies &nbsp;<span style="font-weight:400;text-transform:none;">(min 20 GP)</span></p>
+        <div id="p4-rookies" class="plot"></div>
+      </div>
+    </div>
+
+    <div class="finding">Both veteran and prime players perform significantly better than rookies in all stat categories. Veterans slightly outpace prime players in rebounds, assists, and scoring &mdash; suggesting that as players age, they take on a larger helping role than they had in their prime.</div>
+  </section>
+
+  <!-- 5. POSITIONAL ANALYSIS -->
+  <section class="q" id="positional">
+    <p class="tag"><span class="idx">05</span>Positional Analysis</p>
+    <h2>Which positions lead in scoring, rebounding, and assists?</h2>
+
+    <div class="panel-grid grid-1">
+      <div class="panel">
+        <p class="panel-title">Average Stats by Position (All Seasons)</p>
+        <div id="p5-overall" class="plot"></div>
+      </div>
+      <div class="panel">
+        <p class="panel-title">Average Points per Game by Position Over Time</p>
+        <div id="p5-trend" class="plot"></div>
+      </div>
+    </div>
+
+    <div class="finding">Centers have increased in point scoring over time, forwards have slightly decreased, and guards have stayed roughly the same &mdash; scoring has shifted away from forwards and toward centers and guards. Guards lead in assists and points but rank last in rebounds; centers lead in rebounding, closest to the basket.</div>
+  </section>
+
+  <!-- 6. PLAYER EFFICIENCY -->
+  <section class="q" id="efficiency">
+    <p class="tag"><span class="idx">06</span>Player Efficiency</p>
+    <h2>What does net rating reveal about player and league efficiency?</h2>
+
+    <div class="panel-grid grid-1">
+      <div class="panel">
+        <p class="panel-title">League-Wide Average Net Rating Over Time</p>
+        <div id="p6-league" class="plot"></div>
+      </div>
+      <div class="panel">
+        <p class="panel-title">Top Players by Career Net Rating &nbsp;<span style="font-weight:400;text-transform:none;">(min 8 seasons, 20+ GP)</span></p>
+        <div id="p6-top" class="plot"></div>
+      </div>
+    </div>
+
+    <div class="finding">Average net rating has stayed relatively constant over time. The players with the highest career net ratings &mdash; led by Kawhi Leonard and Manu Ginobili &mdash; are evenly distributed between current and past players, suggesting no major shift in on-court efficiency over this period.</div>
+  </section>
+
+  <!-- 7. INTERNATIONAL IMPACT -->
+  <section class="q" id="international">
+    <p class="tag"><span class="idx">07</span>International Impact</p>
+    <h2>How has international representation evolved?</h2>
+
+    <div class="panel-grid grid-1">
+      <div class="panel">
+        <p class="panel-title">International Players as % of NBA Roster</p>
+        <div id="p7-pct" class="plot"></div>
+      </div>
+      <div class="panel-grid grid-2" style="margin-bottom:0;">
+        <div class="panel">
+          <p class="panel-title">Player-Seasons by Country (excl. USA)</p>
+          <div id="p7-country" class="plot"></div>
+        </div>
+        <div class="panel">
+          <p class="panel-title">Top International Scorers &nbsp;<span style="font-weight:400;text-transform:none;">(min 5 seasons, 20+ GP)</span></p>
+          <div id="p7-scorers" class="plot"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="finding">There has been a steady increase in international players in the NBA, led by Canada, France, and Australia. Most top countries by representation are wealthier nations &mdash; the clear exception being Joel Embiid's Cameroon, currently the league's top international scorer. No country repeats among the top-scoring internationals, and there's no obvious link between a country's representation and the caliber of its top players.</div>
+  </section>
+
+</main>
+
+<footer>
+  NBA Statistics Project &middot; Data: Kaggle &ldquo;NBA Players Data&rdquo; (1996&ndash;2023) &middot; Filtered to 2005&ndash;06 &ndash; 2021&ndash;22
+</footer>
 
 <script>
-const D={"mem":{"Bronze":[510.75,440.8,495.25,470.5,530.4,450.9,505.75,430.8,485.25,460.5,520.4,440.9,500.75,420.8,480.25,470.5,505.75,430.8,485.25,460.5,520.4,440.9,500.75,420.8,480.25,470.5,505.75,430.8,485.25,460.5,520.4,440.9,500.75,420.8,480.25,470.5,505.75,430.8,485.25,460.5,520.4,440.9,500.75,420.8,480.25,470.5,505.75,430.8,480.25,470.5,505.75,430.8,485.25,460.5,520.4,440.9,500.75,430.8,480.25,470.5,505.75,430.8,485.25,460.5,520.4,440.9,450.6,495.25,460.9,515.75,420.8,480.25,470.5,505.75,430.8,485.25,460.5,520.4,440.9,525.75,440.8,490.25,480.5,510.75,410.8,495.25,430.5,505.75,450.8,475.25,470.5,515.75,430.8,495.25,440.5,505.75,450.8,475.25,470.5,515.75,430.8,495.25,440.5,505.75,450.8,475.25,470.5,515.75,430.8,495.25,440.5,505.75,450.8,475.25,470.5,515.75],"Gold":[1120.2,1480.3,1150.6,1520.1,1200.8,1360.2,1170.3,1470.5,1140.6,1500.1,1190.8,1370.2,1160.3,1460.5,1130.6,1490.1,1180.8,1470.5,1140.6,1500.1,1190.8,1370.2,1160.3,1460.5,1130.6,1490.1,1180.8,1470.5,1140.6,1500.1,1190.8,1370.2,1160.3,1460.5,1130.6,1490.1,1180.8,1470.5,1140.6,1500.1,1190.8,1370.2,1160.3,1460.5,1130.6,1490.1,1180.8,1470.5,1130.6,1490.1,1180.8,1470.5,1140.6,1500.1,1190.8,1370.2,1160.3,1460.5,1140.6,1490.1,1180.8,1470.5,1130.6,1500.1,1190.8,1370.2,1160.3,1420.8,1210.6,1390.2,1170.3,1450.5,1130.6,1490.1,1180.8,1470.5,1140.6,1500.1,1190.8,1370.2,1160.3,1460.5,1150.6,1480.1,1170.8,1440.5,1160.6,1490.1,1200.8,1460.5,1140.6,1480.1,1190.8,1450.5,1160.6,1490.1,1200.8,1460.5,1140.6,1480.1,1190.8,1450.5,1160.6,1490.1,1200.8,1460.5,1140.6,1480.1,1190.8,1450.5,1160.6,1490.1,1200.8,1460.5,1140.6,1480.1,1190.8],"Silver":[780.5,720.4,800.9,690.3,820.75,700.6,790.2,710.4,810.9,670.3,830.75,690.6,800.2,700.4,820.9,680.3,790.2,710.4,810.9,670.3,830.75,690.6,800.2,700.4,820.9,680.3,790.2,710.4,810.9,670.3,830.75,690.6,800.2,700.4,820.9,680.3,790.2,710.4,810.9,670.3,830.75,690.6,800.2,700.4,820.9,680.3,790.2,710.4,820.9,680.3,790.2,710.4,810.9,670.3,830.75,690.6,800.2,700.4,820.9,680.3,790.2,710.4,820.9,670.3,830.75,690.6,800.2,730.4,780.9,670.6,810.2,690.4,820.9,680.3,790.2,710.4,820.9,670.3,830.75,690.6,800.2,720.4,830.9,690.3,790.2,700.4,810.9,660.3,780.2,710.4,800.9,660.3,770.2,710.4,820.9,660.3,780.2,710.4,800.9,660.3,800.2,710.4,820.9,660.3,780.2,710.4,800.9,660.3,780.2,710.4,820.9,660.3,780.2,710.4,800.9,660.3,780.2]},"age":{"26-29":[1120.2,720.4,1520.1,1360.2,700.6,710.4,1500.1,1370.2,690.6,700.4,1490.1,710.4,1500.1,1370.2,690.6,700.4,1490.1,710.4,1500.1,1370.2,690.6,700.4,1490.1,710.4,1500.1,1370.2,690.6,700.4,1490.1,710.4,1490.1,710.4,1500.1,1370.2,690.6,700.4,1490.1,710.4,1500.1,1370.2,690.6,730.4,780.9,1390.2,670.6,690.4,1490.1,710.4,1500.1,1370.2,690.6,720.4,1480.1,700.4,1490.1,710.4,1480.1,710.4,1490.1,710.4,1480.1,710.4,1490.1,710.4,1480.1,710.4,1490.1,710.4,1480.1],"30-33":[1480.3,1150.6,690.3,1200.8,820.75,1170.3,1470.5,1140.6,670.3,1190.8,830.75,1160.3,1460.5,1130.6,680.3,1180.8,1470.5,1140.6,670.3,1190.8,830.75,1160.3,1460.5,1130.6,680.3,1180.8,1470.5,1140.6,670.3,1190.8,830.75,1160.3,1460.5,1130.6,680.3,1180.8,1470.5,1140.6,670.3,1190.8,830.75,1160.3,1460.5,1130.6,680.3,1180.8,1470.5,1130.6,680.3,1180.8,1470.5,1140.6,670.3,1190.8,830.75,1160.3,1460.5,1140.6,680.3,1180.8,1470.5,1130.6,670.3,1190.8,830.75,1160.3,1210.6,1170.3,1450.5,1130.6,680.3,1180.8,1470.5,1140.6,670.3,1190.8,830.75,1160.3,1460.5,1150.6,690.3,1170.8,1440.5,1160.6,660.3,1200.8,1460.5,1140.6,660.3,1190.8,770.2,1450.5,1160.6,660.3,1200.8,1460.5,1140.6,660.3,1190.8,800.2,1450.5,1160.6,660.3,1200.8,1460.5,1140.6,660.3,1190.8,1450.5,1160.6,660.3,1200.8,1460.5,1140.6,660.3,1190.8],"34-37":[780.5,440.8,800.9,470.5,790.2,430.8,810.9,460.5,800.2,420.8,820.9,470.5,790.2,430.8,810.9,460.5,800.2,420.8,820.9,470.5,790.2,430.8,810.9,460.5,800.2,420.8,820.9,470.5,790.2,430.8,810.9,460.5,800.2,420.8,820.9,470.5,790.2,430.8,820.9,470.5,790.2,430.8,810.9,460.5,800.2,430.8,820.9,470.5,790.2,430.8,820.9,460.5,800.2,1420.8,450.6,810.2,420.8,820.9,470.5,790.2,430.8,820.9,460.5,800.2,440.8,830.9,480.5,790.2,410.8,810.9,430.5,780.2,450.8,800.9,470.5,430.8,820.9,440.5,780.2,450.8,800.9,470.5,430.8,820.9,440.5,780.2,450.8,800.9,470.5,780.2,430.8,820.9,440.5,780.2,450.8,800.9,470.5,780.2],"38-43":[510.75,495.25,530.4,450.9,505.75,485.25,520.4,440.9,500.75,480.25,505.75,485.25,520.4,440.9,500.75,480.25,505.75,485.25,520.4,440.9,500.75,480.25,505.75,485.25,520.4,440.9,500.75,480.25,505.75,480.25,505.75,485.25,520.4,440.9,500.75,480.25,505.75,485.25,520.4,440.9,495.25,460.9,515.75,480.25,505.75,485.25,520.4,440.9,525.75,490.25,510.75,495.25,505.75,475.25,515.75,495.25,505.75,475.25,515.75,495.25,505.75,475.25,515.75,495.25,505.75,475.25,515.75]},"disc":{"False":[780.5,1480.3,440.8,800.9,1520.1,470.5,820.75,1360.2,450.9,790.2,1470.5,430.8,810.9,1500.1,460.5,830.75,1370.2,440.9,800.2,1460.5,420.8,820.9,1490.1,470.5,790.2,1470.5,430.8,810.9,1500.1,460.5,830.75,1370.2,440.9,800.2,1460.5,420.8,820.9,1490.1,470.5,790.2,1470.5,430.8,810.9,1500.1,460.5,830.75,1370.2,440.9,800.2,1460.5,420.8,820.9,1490.1,470.5,790.2,1470.5,430.8,810.9,1500.1,460.5,830.75,1370.2,440.9,800.2,1460.5,420.8,820.9,1490.1,470.5,790.2,1470.5,430.8,820.9,1490.1,470.5,790.2,1470.5,430.8,810.9,1500.1,460.5,830.75,1370.2,440.9,800.2,1460.5,430.8,820.9,1490.1,470.5,790.2,1470.5,430.8,820.9,1500.1,460.5,830.75,1370.2,440.9,800.2,1420.8,450.6,780.9,1390.2,460.9,810.2,1450.5,420.8,820.9,1490.1,470.5,790.2,1470.5,430.8,820.9,1500.1,460.5,830.75,1370.2,440.9,800.2,1460.5,440.8,830.9,1480.1,480.5,790.2,1440.5,410.8,810.9,1490.1,430.5,780.2,1460.5,450.8,800.9,1480.1,470.5,770.2,1450.5,430.8,820.9,1490.1,440.5,780.2,1460.5,450.8,800.9,1480.1,470.5,800.2,1450.5,430.8,820.9,1490.1,440.5,780.2,1460.5,450.8,800.9,1480.1,470.5,780.2,1450.5,430.8,820.9,1490.1,440.5,780.2,1460.5,450.8,800.9,1480.1,470.5,780.2],"True":[1120.2,510.75,720.4,1150.6,495.25,690.3,1200.8,530.4,700.6,1170.3,505.75,710.4,1140.6,485.25,670.3,1190.8,520.4,690.6,1160.3,500.75,700.4,1130.6,480.25,680.3,1180.8,505.75,710.4,1140.6,485.25,670.3,1190.8,520.4,690.6,1160.3,500.75,700.4,1130.6,480.25,680.3,1180.8,505.75,710.4,1140.6,485.25,670.3,1190.8,520.4,690.6,1160.3,500.75,700.4,1130.6,480.25,680.3,1180.8,505.75,710.4,1140.6,485.25,670.3,1190.8,520.4,690.6,1160.3,500.75,700.4,1130.6,480.25,680.3,1180.8,505.75,710.4,1130.6,480.25,680.3,1180.8,505.75,710.4,1140.6,485.25,670.3,1190.8,520.4,690.6,1160.3,500.75,700.4,1140.6,480.25,680.3,1180.8,505.75,710.4,1130.6,485.25,670.3,1190.8,520.4,690.6,1160.3,730.4,1210.6,495.25,670.6,1170.3,515.75,690.4,1130.6,480.25,680.3,1180.8,505.75,710.4,1140.6,485.25,670.3,1190.8,520.4,690.6,1160.3,525.75,720.4,1150.6,490.25,690.3,1170.8,510.75,700.4,1160.6,495.25,660.3,1200.8,505.75,710.4,1140.6,475.25,660.3,1190.8,515.75,710.4,1160.6,495.25,660.3,1200.8,505.75,710.4,1140.6,475.25,660.3,1190.8,515.75,710.4,1160.6,495.25,660.3,1200.8,505.75,710.4,1140.6,475.25,660.3,1190.8,515.75,710.4,1160.6,495.25,660.3,1200.8,505.75,710.4,1140.6,475.25,660.3,1190.8,515.75]},"gen":{"Female":[1120.2,510.75,440.8,1150.6,495.25,470.5,1200.8,530.4,450.9,1170.3,505.75,430.8,1140.6,485.25,460.5,1190.8,520.4,440.9,1160.3,500.75,420.8,1130.6,480.25,470.5,1180.8,505.75,430.8,1140.6,485.25,460.5,1190.8,520.4,440.9,1160.3,500.75,420.8,1130.6,480.25,470.5,1180.8,505.75,430.8,1140.6,485.25,460.5,1190.8,520.4,440.9,1160.3,500.75,420.8,1130.6,480.25,470.5,1180.8,505.75,430.8,1140.6,485.25,460.5,1190.8,520.4,440.9,1160.3,500.75,420.8,1130.6,480.25,470.5,1180.8,505.75,430.8,1130.6,480.25,470.5,1180.8,505.75,430.8,1140.6,485.25,460.5,1190.8,520.4,440.9,1160.3,500.75,430.8,1140.6,480.25,470.5,1180.8,505.75,430.8,1130.6,485.25,460.5,1190.8,520.4,440.9,1160.3,730.4,450.6,495.25,460.9,1170.3,515.75,420.8,1130.6,480.25,470.5,1180.8,505.75,430.8,1140.6,485.25,460.5,1190.8,520.4,440.9,1160.3,525.75,440.8,1150.6,490.25,480.5,1170.8,510.75,410.8,1160.6,495.25,430.5,1200.8,505.75,450.8,1140.6,475.25,470.5,1190.8,515.75,430.8,1160.6,495.25,440.5,1200.8,505.75,450.8,1140.6,475.25,470.5,1190.8,515.75,430.8,1160.6,495.25,440.5,1200.8,505.75,450.8,1140.6,475.25,470.5,1190.8,515.75,430.8,1160.6,495.25,440.5,1200.8,505.75,450.8,1140.6,475.25,470.5,1190.8,515.75],"Male":[780.5,1480.3,720.4,800.9,1520.1,690.3,820.75,1360.2,700.6,790.2,1470.5,710.4,810.9,1500.1,670.3,830.75,1370.2,690.6,800.2,1460.5,700.4,820.9,1490.1,680.3,790.2,1470.5,710.4,810.9,1500.1,670.3,830.75,1370.2,690.6,800.2,1460.5,700.4,820.9,1490.1,680.3,790.2,1470.5,710.4,810.9,1500.1,670.3,830.75,1370.2,690.6,800.2,1460.5,700.4,820.9,1490.1,680.3,790.2,1470.5,710.4,810.9,1500.1,670.3,830.75,1370.2,690.6,800.2,1460.5,700.4,820.9,1490.1,680.3,790.2,1470.5,710.4,820.9,1490.1,680.3,790.2,1470.5,710.4,810.9,1500.1,670.3,830.75,1370.2,690.6,800.2,1460.5,700.4,820.9,1490.1,680.3,790.2,1470.5,710.4,820.9,1500.1,670.3,830.75,1370.2,690.6,800.2,1420.8,1210.6,780.9,1390.2,670.6,810.2,1450.5,690.4,820.9,1490.1,680.3,790.2,1470.5,710.4,820.9,1500.1,670.3,830.75,1370.2,690.6,800.2,1460.5,720.4,830.9,1480.1,690.3,790.2,1440.5,700.4,810.9,1490.1,660.3,780.2,1460.5,710.4,800.9,1480.1,660.3,770.2,1450.5,710.4,820.9,1490.1,660.3,780.2,1460.5,710.4,800.9,1480.1,660.3,800.2,1450.5,710.4,820.9,1490.1,660.3,780.2,1460.5,710.4,800.9,1480.1,660.3,780.2,1450.5,710.4,820.9,1490.1,660.3,780.2,1460.5,710.4,800.9,1480.1,660.3,780.2]},"city_items":{"Chicago":[9,10,9,10,9,9,10,9,10,9,9,10,9,10,9,9,10,9,10,9,9,10,9,10,9,10,9,9,10,9,10,9,9,10,9,9,10,9,9,9,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10,9,10],"Houston":[8,7,8,7,8,8,7,8,7,8,8,7,8,7,8,8,7,8,7,8,8,7,8,7,8,7,8,8,7,8,7,8,8,7,8,7,8,7,8,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8],"Los Angeles":[11,12,13,11,12,13,11,12,11,12,13,11,12,11,12,13,11,12,11,12,13,11,12,11,12,11,12,13,11,12,11,12,13,11,11,11,12,11,12,13,11,12,11,12,11,12,11,12,11,12,11,12,11,12,11,12,11,12,11],"Miami":[13,11,12,13,10,12,13,10,13,10,12,13,10,13,10,12,13,10,13,10,12,13,10,13,10,13,10,12,13,10,13,10,12,14,12,13,10,13,10,12,13,10,13,10,13,10,13,10,13,10,13,10,13,10,13,10,13,10],"New York":[14,15,16,14,15,16,14,15,16,15,16,14,15,16,15,16,14,15,16,15,16,14,15,16,15,16,15,16,14,15,16,15,16,14,17,14,15,16,15,16,14,15,16,15,16,15,16,15,16,15,16,15,16,15,16,15,16,15,16],"San Francisco":[19,21,18,20,21,18,20,21,20,21,18,20,21,20,21,18,20,21,20,21,18,20,21,20,21,20,21,18,20,21,20,21,18,19,18,20,21,20,21,18,20,21,19,21,20,21,19,21,20,21,19,21,20,21,19,21,20,21]},"items_spend":[[14.0,1120.2],[11.0,780.5],[9.0,510.75],[19.0,1480.3],[13.0,720.4],[8.0,440.8],[15.0,1150.6],[12.0,800.9],[10.0,495.25],[21.0,1520.1],[11.0,690.3],[7.0,470.5],[16.0,1200.8],[13.0,820.75],[9.0,530.4],[18.0,1360.2],[12.0,700.6],[8.0,450.9],[14.0,1170.3],[11.0,790.2],[10.0,505.75],[20.0,1470.5],[13.0,710.4],[7.0,430.8],[15.0,1140.6],[12.0,810.9],[9.0,485.25],[21.0,1500.1],[10.0,670.3],[8.0,460.5],[16.0,1190.8],[13.0,830.75],[9.0,520.4],[18.0,1370.2],[12.0,690.6],[8.0,440.9],[14.0,1160.3],[11.0,800.2],[10.0,500.75],[20.0,1460.5],[13.0,700.4],[7.0,420.8],[15.0,1130.6],[12.0,820.9],[9.0,480.25],[21.0,1490.1],[10.0,680.3],[8.0,470.5],[16.0,1180.8],[11.0,790.2],[10.0,505.75],[20.0,1470.5],[13.0,710.4],[7.0,430.8],[15.0,1140.6],[12.0,810.9],[9.0,485.25],[21.0,1500.1],[10.0,670.3],[8.0,460.5],[16.0,1190.8],[13.0,830.75],[9.0,520.4],[18.0,1370.2],[12.0,690.6],[8.0,440.9],[14.0,1160.3],[11.0,800.2],[10.0,500.75],[20.0,1460.5],[13.0,700.4],[7.0,420.8],[15.0,1130.6],[12.0,820.9],[9.0,480.25],[21.0,1490.1],[10.0,680.3],[8.0,470.5],[16.0,1180.8],[11.0,790.2],[10.0,505.75],[20.0,1470.5],[13.0,710.4],[7.0,430.8],[15.0,1140.6],[12.0,810.9],[9.0,485.25],[21.0,1500.1],[10.0,670.3],[8.0,460.5],[16.0,1190.8],[13.0,830.75],[9.0,520.4],[18.0,1370.2],[12.0,690.6],[8.0,440.9],[14.0,1160.3],[11.0,800.2],[10.0,500.75],[20.0,1460.5],[13.0,700.4],[7.0,420.8],[15.0,1130.6],[12.0,820.9],[9.0,480.25],[21.0,1490.1],[10.0,680.3],[8.0,470.5],[16.0,1180.8],[11.0,790.2],[10.0,505.75],[20.0,1470.5],[13.0,710.4],[7.0,430.8],[15.0,1140.6],[12.0,810.9],[9.0,485.25],[21.0,1500.1],[10.0,670.3],[8.0,460.5],[16.0,1190.8],[13.0,830.75],[9.0,520.4],[18.0,1370.2],[12.0,690.6],[8.0,440.9],[14.0,1160.3],[11.0,800.2],[10.0,500.75],[20.0,1460.5],[13.0,700.4],[7.0,420.8],[15.0,1130.6],[12.0,820.9],[9.0,480.25],[21.0,1490.1],[10.0,680.3],[8.0,470.5],[16.0,1180.8],[11.0,790.2],[10.0,505.75],[20.0,1470.5],[13.0,710.4],[7.0,430.8],[15.0,1130.6],[12.0,820.9],[9.0,480.25],[21.0,1490.1],[10.0,680.3],[8.0,470.5],[16.0,1180.8],[11.0,790.2],[10.0,505.75],[20.0,1470.5],[13.0,710.4],[7.0,430.8],[15.0,1140.6],[12.0,810.9],[9.0,485.25],[21.0,1500.1],[10.0,670.3],[8.0,460.5],[16.0,1190.8],[13.0,830.75],[9.0,520.4],[18.0,1370.2],[12.0,690.6],[8.0,440.9],[14.0,1160.3],[11.0,800.2],[10.0,500.75],[20.0,1460.5],[13.0,700.4],[7.0,430.8],[15.0,1140.6],[12.0,820.9],[9.0,480.25],[21.0,1490.1],[10.0,680.3],[8.0,470.5],[16.0,1180.8],[11.0,790.2],[10.0,505.75],[20.0,1470.5],[13.0,710.4],[7.0,430.8],[15.0,1130.6],[12.0,820.9],[9.0,485.25],[21.0,1500.1],[10.0,670.3],[8.0,460.5],[16.0,1190.8],[13.0,830.75],[9.0,520.4],[18.0,1370.2],[12.0,690.6],[8.0,440.9],[14.0,1160.3],[11.0,800.2],[19.0,1420.8],[14.0,730.4],[7.0,450.6],[17.0,1210.6],[11.0,780.9],[10.0,495.25],[18.0,1390.2],[12.0,670.6],[8.0,460.9],[14.0,1170.3],[11.0,810.2],[9.0,515.75],[20.0,1450.5],[13.0,690.4],[7.0,420.8],[15.0,1130.6],[12.0,820.9],[9.0,480.25],[21.0,1490.1],[10.0,680.3],[8.0,470.5],[16.0,1180.8],[11.0,790.2],[10.0,505.75],[20.0,1470.5],[13.0,710.4],[7.0,430.8],[15.0,1140.6],[12.0,820.9],[9.0,485.25],[21.0,1500.1],[10.0,670.3],[8.0,460.5],[16.0,1190.8],[13.0,830.75],[9.0,520.4],[18.0,1370.2],[12.0,690.6],[8.0,440.9],[14.0,1160.3],[11.0,800.2],[9.0,525.75],[20.0,1460.5],[13.0,720.4],[7.0,440.8],[15.0,1150.6],[12.0,830.9],[9.0,490.25],[21.0,1480.1],[10.0,690.3],[8.0,480.5],[16.0,1170.8],[11.0,790.2],[10.0,510.75],[19.0,1440.5],[13.0,700.4],[7.0,410.8],[15.0,1160.6],[12.0,810.9],[9.0,495.25],[21.0,1490.1],[10.0,660.3],[8.0,430.5],[16.0,1200.8],[11.0,780.2],[10.0,505.75],[20.0,1460.5],[13.0,710.4],[7.0,450.8],[15.0,1140.6],[12.0,800.9],[9.0,475.25],[21.0,1480.1],[10.0,660.3],[8.0,470.5],[16.0,1190.8],[11.0,770.2],[10.0,515.75],[19.0,1450.5],[13.0,710.4],[7.0,430.8],[15.0,1160.6],[12.0,820.9],[9.0,495.25],[21.0,1490.1],[10.0,660.3],[8.0,440.5],[16.0,1200.8],[11.0,780.2],[10.0,505.75],[20.0,1460.5],[13.0,710.4],[7.0,450.8],[15.0,1140.6],[12.0,800.9],[9.0,475.25],[21.0,1480.1],[10.0,660.3],[8.0,470.5],[16.0,1190.8],[11.0,800.2],[10.0,515.75],[19.0,1450.5],[13.0,710.4],[7.0,430.8],[15.0,1160.6],[12.0,820.9],[9.0,495.25],[21.0,1490.1],[10.0,660.3],[8.0,440.5],[16.0,1200.8],[11.0,780.2],[10.0,505.75],[20.0,1460.5],[13.0,710.4],[7.0,450.8],[15.0,1140.6],[12.0,800.9],[9.0,475.25],[21.0,1480.1],[10.0,660.3],[8.0,470.5],[16.0,1190.8],[11.0,780.2],[10.0,515.75]],"days_spend":[[25.0,1120.2],[18.0,780.5],[42.0,510.75],[12.0,1480.3],[55.0,720.4],[22.0,440.8],[28.0,1150.6],[14.0,800.9],[40.0,495.25],[9.0,1520.1],[34.0,690.3],[20.0,470.5],[21.0,1200.8],[15.0,820.75],[38.0,530.4],[11.0,1360.2],[48.0,700.6],[25.0,450.9],[29.0,1170.3],[16.0,790.2],[41.0,505.75],[13.0,1470.5],[54.0,710.4],[23.0,430.8],[27.0,1140.6],[13.0,810.9],[39.0,485.25],[10.0,1500.1],[33.0,670.3],[19.0,460.5],[20.0,1190.8],[14.0,830.75],[37.0,520.4],[10.0,1370.2],[47.0,690.6],[24.0,440.9],[22.0,1160.3],[17.0,800.2],[40.0,500.75],[12.0,1460.5],[53.0,700.4],[21.0,420.8],[26.0,1130.6],[12.0,820.9],[38.0,480.25],[9.0,1490.1],[32.0,680.3],[18.0,470.5],[19.0,1180.8],[15.0,790.2],[39.0,505.75],[13.0,1470.5],[54.0,710.4],[23.0,430.8],[27.0,1140.6],[13.0,810.9],[39.0,485.25],[10.0,1500.1],[33.0,670.3],[19.0,460.5],[20.0,1190.8],[14.0,830.75],[37.0,520.4],[10.0,1370.2],[47.0,690.6],[24.0,440.9],[22.0,1160.3],[17.0,800.2],[40.0,500.75],[12.0,1460.5],[53.0,700.4],[21.0,420.8],[26.0,1130.6],[12.0,820.9],[38.0,480.25],[9.0,1490.1],[32.0,680.3],[18.0,470.5],[19.0,1180.8],[15.0,790.2],[39.0,505.75],[13.0,1470.5],[54.0,710.4],[23.0,430.8],[27.0,1140.6],[13.0,810.9],[39.0,485.25],[10.0,1500.1],[33.0,670.3],[19.0,460.5],[20.0,1190.8],[14.0,830.75],[37.0,520.4],[10.0,1370.2],[47.0,690.6],[24.0,440.9],[22.0,1160.3],[17.0,800.2],[40.0,500.75],[12.0,1460.5],[53.0,700.4],[21.0,420.8],[26.0,1130.6],[12.0,820.9],[38.0,480.25],[9.0,1490.1],[32.0,680.3],[18.0,470.5],[19.0,1180.8],[15.0,790.2],[39.0,505.75],[13.0,1470.5],[54.0,710.4],[23.0,430.8],[27.0,1140.6],[13.0,810.9],[39.0,485.25],[10.0,1500.1],[33.0,670.3],[19.0,460.5],[20.0,1190.8],[14.0,830.75],[37.0,520.4],[10.0,1370.2],[47.0,690.6],[24.0,440.9],[22.0,1160.3],[17.0,800.2],[40.0,500.75],[12.0,1460.5],[53.0,700.4],[21.0,420.8],[26.0,1130.6],[12.0,820.9],[38.0,480.25],[9.0,1490.1],[32.0,680.3],[18.0,470.5],[19.0,1180.8],[15.0,790.2],[39.0,505.75],[13.0,1470.5],[54.0,710.4],[23.0,430.8],[26.0,1130.6],[12.0,820.9],[38.0,480.25],[9.0,1490.1],[32.0,680.3],[18.0,470.5],[19.0,1180.8],[15.0,790.2],[39.0,505.75],[13.0,1470.5],[54.0,710.4],[23.0,430.8],[27.0,1140.6],[13.0,810.9],[39.0,485.25],[10.0,1500.1],[33.0,670.3],[19.0,460.5],[20.0,1190.8],[14.0,830.75],[37.0,520.4],[10.0,1370.2],[47.0,690.6],[24.0,440.9],[22.0,1160.3],[17.0,800.2],[40.0,500.75],[12.0,1460.5],[53.0,700.4],[23.0,430.8],[27.0,1140.6],[12.0,820.9],[38.0,480.25],[9.0,1490.1],[32.0,680.3],[18.0,470.5],[19.0,1180.8],[15.0,790.2],[39.0,505.75],[13.0,1470.5],[54.0,710.4],[23.0,430.8],[26.0,1130.6],[13.0,820.9],[39.0,485.25],[10.0,1500.1],[33.0,670.3],[19.0,460.5],[20.0,1190.8],[14.0,830.75],[37.0,520.4],[10.0,1370.2],[47.0,690.6],[24.0,440.9],[22.0,1160.3],[17.0,800.2],[11.0,1420.8],[50.0,730.4],[21.0,450.6],[18.0,1210.6],[16.0,780.9],[35.0,495.25],[9.0,1390.2],[46.0,670.6],[25.0,460.9],[21.0,1170.3],[14.0,810.2],[38.0,515.75],[12.0,1450.5],[52.0,690.4],[24.0,420.8],[26.0,1130.6],[13.0,820.9],[39.0,480.25],[9.0,1490.1],[32.0,680.3],[18.0,470.5],[19.0,1180.8],[15.0,790.2],[39.0,505.75],[13.0,1470.5],[54.0,710.4],[23.0,430.8],[27.0,1140.6],[13.0,820.9],[39.0,485.25],[10.0,1500.1],[33.0,670.3],[19.0,460.5],[20.0,1190.8],[14.0,830.75],[37.0,520.4],[10.0,1370.2],[47.0,690.6],[24.0,440.9],[22.0,1160.3],[17.0,800.2],[40.0,525.75],[11.0,1460.5],[55.0,720.4],[25.0,440.8],[28.0,1150.6],[14.0,830.9],[40.0,490.25],[10.0,1480.1],[34.0,690.3],[20.0,480.5],[21.0,1170.8],[15.0,790.2],[41.0,510.75],[12.0,1440.5],[56.0,700.4],[26.0,410.8],[29.0,1160.6],[14.0,810.9],[41.0,495.25],[10.0,1490.1],[35.0,660.3],[21.0,430.5],[22.0,1200.8],[16.0,780.2],[42.0,505.75],[13.0,1460.5],[57.0,710.4],[24.0,450.8],[30.0,1140.6],[17.0,800.9],[42.0,475.25],[11.0,1480.1],[36.0,660.3],[22.0,470.5],[23.0,1190.8],[18.0,770.2],[43.0,515.75],[12.0,1450.5],[58.0,710.4],[27.0,430.8],[31.0,1160.6],[15.0,820.9],[43.0,495.25],[10.0,1490.1],[37.0,660.3],[23.0,440.5],[24.0,1200.8],[16.0,780.2],[44.0,505.75],[13.0,1460.5],[59.0,710.4],[28.0,450.8],[32.0,1140.6],[17.0,800.9],[44.0,475.25],[12.0,1480.1],[38.0,660.3],[22.0,470.5],[25.0,1190.8],[18.0,800.2],[45.0,515.75],[13.0,1450.5],[60.0,710.4],[29.0,430.8],[33.0,1160.6],[16.0,820.9],[45.0,495.25],[11.0,1490.1],[39.0,660.3],[24.0,440.5],[25.0,1200.8],[17.0,780.2],[46.0,505.75],[14.0,1460.5],[61.0,710.4],[30.0,450.8],[34.0,1140.6],[19.0,800.9],[46.0,475.25],[12.0,1480.1],[40.0,660.3],[26.0,470.5],[27.0,1190.8],[18.0,780.2],[47.0,515.75],[14.0,1450.5],[62.0,710.4],[31.0,430.8],[35.0,1160.6],[20.0,820.9],[47.0,495.25],[11.0,1490.1],[41.0,660.3],[28.0,440.5],[28.0,1200.8],[19.0,780.2],[48.0,505.75],[15.0,1460.5],[63.0,710.4],[32.0,450.8],[36.0,1140.6],[20.0,800.9],[48.0,475.25],[13.0,1480.1],[42.0,660.3],[27.0,470.5],[28.0,1190.8],[21.0,780.2],[49.0,515.75]],"sat_spend":[[3.0,1120.2],[2.0,780.5],[1.0,510.75],[3.0,1480.3],[1.0,720.4],[2.0,440.8],[3.0,1150.6],[2.0,800.9],[1.0,495.25],[3.0,1520.1],[1.0,690.3],[2.0,470.5],[3.0,1200.8],[3.0,820.75],[1.0,530.4],[3.0,1360.2],[1.0,700.6],[2.0,450.9],[3.0,1170.3],[2.0,790.2],[1.0,505.75],[3.0,1470.5],[1.0,710.4],[2.0,430.8],[3.0,1140.6],[2.0,810.9],[1.0,485.25],[3.0,1500.1],[1.0,670.3],[2.0,460.5],[3.0,1190.8],[3.0,830.75],[1.0,520.4],[3.0,1370.2],[1.0,690.6],[2.0,440.9],[3.0,1160.3],[2.0,800.2],[1.0,500.75],[3.0,1460.5],[1.0,700.4],[2.0,420.8],[3.0,1130.6],[2.0,820.9],[1.0,480.25],[3.0,1490.1],[1.0,680.3],[2.0,470.5],[3.0,1180.8],[2.0,790.2],[1.0,505.75],[3.0,1470.5],[1.0,710.4],[2.0,430.8],[3.0,1140.6],[2.0,810.9],[1.0,485.25],[3.0,1500.1],[1.0,670.3],[2.0,460.5],[3.0,1190.8],[3.0,830.75],[1.0,520.4],[3.0,1370.2],[1.0,690.6],[2.0,440.9],[3.0,1160.3],[2.0,800.2],[1.0,500.75],[3.0,1460.5],[1.0,700.4],[3.0,1130.6],[2.0,820.9],[1.0,480.25],[3.0,1490.1],[1.0,680.3],[2.0,470.5],[3.0,1180.8],[2.0,790.2],[1.0,505.75],[3.0,1470.5],[1.0,710.4],[2.0,430.8],[3.0,1140.6],[2.0,810.9],[1.0,485.25],[3.0,1500.1],[1.0,670.3],[2.0,460.5],[3.0,1190.8],[3.0,830.75],[1.0,520.4],[3.0,1370.2],[1.0,690.6],[2.0,440.9],[3.0,1160.3],[2.0,800.2],[1.0,500.75],[3.0,1460.5],[1.0,700.4],[2.0,420.8],[3.0,1130.6],[2.0,820.9],[1.0,480.25],[3.0,1490.1],[1.0,680.3],[2.0,470.5],[3.0,1180.8],[2.0,790.2],[1.0,505.75],[3.0,1470.5],[1.0,710.4],[2.0,430.8],[3.0,1140.6],[2.0,810.9],[1.0,485.25],[3.0,1500.1],[1.0,670.3],[2.0,460.5],[3.0,1190.8],[3.0,830.75],[1.0,520.4],[3.0,1370.2],[1.0,690.6],[2.0,440.9],[3.0,1160.3],[2.0,800.2],[1.0,500.75],[3.0,1460.5],[1.0,700.4],[2.0,420.8],[3.0,1130.6],[2.0,820.9],[1.0,480.25],[3.0,1490.1],[1.0,680.3],[2.0,470.5],[3.0,1180.8],[2.0,790.2],[1.0,505.75],[3.0,1470.5],[1.0,710.4],[3.0,1130.6],[2.0,820.9],[1.0,480.25],[3.0,1490.1],[1.0,680.3],[2.0,470.5],[3.0,1180.8],[2.0,790.2],[1.0,505.75],[3.0,1470.5],[1.0,710.4],[2.0,430.8],[3.0,1140.6],[2.0,810.9],[1.0,485.25],[3.0,1500.1],[1.0,670.3],[2.0,460.5],[3.0,1190.8],[3.0,830.75],[1.0,520.4],[3.0,1370.2],[1.0,690.6],[2.0,440.9],[3.0,1160.3],[2.0,800.2],[1.0,500.75],[3.0,1460.5],[1.0,700.4],[2.0,430.8],[3.0,1140.6],[2.0,820.9],[1.0,480.25],[3.0,1490.1],[1.0,680.3],[2.0,470.5],[3.0,1180.8],[2.0,790.2],[1.0,505.75],[3.0,1470.5],[1.0,710.4],[2.0,430.8],[3.0,1130.6],[2.0,820.9],[1.0,485.25],[3.0,1500.1],[1.0,670.3],[2.0,460.5],[3.0,1190.8],[3.0,830.75],[1.0,520.4],[3.0,1370.2],[1.0,690.6],[2.0,440.9],[3.0,1160.3],[2.0,800.2],[3.0,1420.8],[1.0,730.4],[2.0,450.6],[3.0,1210.6],[2.0,780.9],[1.0,495.25],[3.0,1390.2],[1.0,670.6],[2.0,460.9],[3.0,1170.3],[2.0,810.2],[1.0,515.75],[3.0,1450.5],[1.0,690.4],[2.0,420.8],[3.0,1130.6],[2.0,820.9],[1.0,480.25],[3.0,1490.1],[1.0,680.3],[2.0,470.5],[3.0,1180.8],[2.0,790.2],[1.0,505.75],[3.0,1470.5],[1.0,710.4],[2.0,430.8],[3.0,1140.6],[2.0,820.9],[1.0,485.25],[3.0,1500.1],[1.0,670.3],[2.0,460.5],[3.0,1190.8],[3.0,830.75],[1.0,520.4],[3.0,1370.2],[1.0,690.6],[2.0,440.9],[3.0,1160.3],[2.0,800.2],[1.0,525.75],[3.0,1460.5],[1.0,720.4],[2.0,440.8],[3.0,1150.6],[2.0,830.9],[1.0,490.25],[3.0,1480.1],[1.0,690.3],[2.0,480.5],[3.0,1170.8],[2.0,790.2],[1.0,510.75],[3.0,1440.5],[1.0,700.4],[2.0,410.8],[3.0,1160.6],[2.0,810.9],[1.0,495.25],[3.0,1490.1],[1.0,660.3],[2.0,430.5],[3.0,1200.8],[2.0,780.2],[1.0,505.75],[3.0,1460.5],[1.0,710.4],[2.0,450.8],[3.0,1140.6],[2.0,800.9],[1.0,475.25],[3.0,1480.1],[1.0,660.3],[2.0,470.5],[3.0,1190.8],[2.0,770.2],[1.0,515.75],[3.0,1450.5],[1.0,710.4],[2.0,430.8],[3.0,1160.6],[2.0,820.9],[1.0,495.25],[3.0,1490.1],[1.0,660.3],[2.0,440.5],[3.0,1200.8],[2.0,780.2],[1.0,505.75],[3.0,1460.5],[1.0,710.4],[2.0,450.8],[3.0,1140.6],[2.0,800.9],[1.0,475.25],[3.0,1480.1],[1.0,660.3],[2.0,470.5],[3.0,1190.8],[2.0,800.2],[1.0,515.75],[3.0,1450.5],[1.0,710.4],[2.0,430.8],[3.0,1160.6],[2.0,820.9],[1.0,495.25],[3.0,1490.1],[1.0,660.3],[2.0,440.5],[3.0,1200.8],[2.0,780.2],[1.0,505.75],[3.0,1460.5],[1.0,710.4],[2.0,450.8],[3.0,1140.6],[2.0,800.9],[1.0,475.25],[3.0,1480.1],[1.0,660.3],[2.0,470.5],[3.0,1190.8],[2.0,780.2],[1.0,515.75],[3.0,1450.5],[1.0,710.4],[2.0,430.8],[3.0,1160.6],[2.0,820.9],[1.0,495.25],[3.0,1490.1],[1.0,660.3],[2.0,440.5],[3.0,1200.8],[2.0,780.2],[1.0,505.75],[3.0,1460.5],[1.0,710.4],[2.0,450.8],[3.0,1140.6],[2.0,800.9],[1.0,475.25],[3.0,1480.1],[1.0,660.3],[2.0,470.5],[3.0,1190.8],[2.0,780.2],[1.0,515.75]],"city_ratings":{"Chicago":3.46,"Houston":3.19,"Los Angeles":4.17,"Miami":3.93,"New York":4.54,"San Francisco":4.81},"age_mem":{"Bronze":[43,37,41,36,42,38,43,37,41,36,42,38,43,37,41,36,43,37,41,36,42,38,43,37,41,36,43,37,41,36,42,38,43,37,41,36,43,37,41,36,42,38,43,37,41,36,43,37,41,36,43,37,41,36,42,38,43,37,41,36,43,37,41,36,42,38,35,42,38,43,37,41,36,43,37,41,36,42,38,43,37,41,36,43,37,41,36,43,37,41,36,43,37,41,36,43,37,41,36,43,37,41,36,43,37,41,36,43,37,41,36,43,37,41,36,43],"Gold":[29,30,31,28,30,29,32,30,31,28,30,29,32,30,31,28,30,30,31,28,30,29,32,30,31,28,30,30,31,28,30,29,32,30,31,28,30,30,31,28,30,29,32,30,31,28,30,30,31,28,30,30,31,28,30,29,32,30,31,28,30,30,31,28,30,29,32,36,31,29,32,30,31,28,30,30,31,28,30,29,32,30,31,28,30,30,31,28,30,30,31,28,30,30,31,28,30,30,31,28,30,30,31,28,30,30,31,28,30,30,31,28,30,30,31,28,30],"Silver":[34,27,35,32,33,26,34,27,35,32,33,26,34,27,35,32,34,27,35,32,33,26,34,27,35,32,34,27,35,32,33,26,34,27,35,32,34,27,35,32,33,26,34,27,35,32,34,27,35,32,34,27,35,32,33,26,34,27,35,32,34,27,35,32,33,26,34,29,27,26,34,27,35,32,34,27,35,32,33,26,34,27,35,32,34,27,35,32,34,27,35,32,33,27,35,32,34,27,35,32,33,27,35,32,34,27,35,32,34,27,35,32,34,27,35,32,34]}};
+const DATA = {"career_longevity": {"hist": {"Guard": {"x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], "y": [182, 132, 90, 56, 41, 29, 21, 25, 20, 20, 16, 10, 12, 11, 3, 2, 2]}, "Forward": {"x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], "y": [212, 145, 119, 79, 60, 55, 44, 49, 29, 33, 26, 22, 17, 9, 6, 3, 5]}, "Center": {"x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17], "y": [60, 30, 22, 31, 15, 23, 18, 19, 16, 8, 8, 2, 3, 9, 1, 1, 1]}}, "avg_by_position": {"Center": {"mean": 5.056, "se": 0.23}, "Forward": {"mean": 4.618, "se": 0.123}, "Guard": {"mean": 4.112, "se": 0.139}}, "longest_careers": [{"player": "Dwight Howard", "seasons": 17, "position": "Center"}, {"player": "Andre Iguodala", "seasons": 17, "position": "Forward"}, {"player": "Chris Paul", "seasons": 17, "position": "Guard"}, {"player": "Lou Williams", "seasons": 17, "position": "Guard"}, {"player": "LeBron James", "seasons": 17, "position": "Forward"}, {"player": "Carmelo Anthony", "seasons": 17, "position": "Forward"}, {"player": "Trevor Ariza", "seasons": 17, "position": "Forward"}, {"player": "Udonis Haslem", "seasons": 17, "position": "Forward"}, {"player": "CJ Miles", "seasons": 16, "position": "Forward"}, {"player": "Rajon Rondo", "seasons": 16, "position": "Guard"}, {"player": "LaMarcus Aldridge", "seasons": 16, "position": "Center"}, {"player": "Rudy Gay", "seasons": 16, "position": "Forward"}, {"player": "Kyle Lowry", "seasons": 16, "position": "Guard"}, {"player": "Paul Millsap", "seasons": 16, "position": "Forward"}]}, "age_performance": {"age": [18.0, 19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0, 32.0, 33.0, 34.0, 35.0, 36.0, 37.0, 38.0, 39.0, 40.0], "points": [1.6, 7.133, 7.63, 7.657, 7.785, 7.218, 7.459, 8.235, 9.179, 9.362, 9.647, 9.786, 9.229, 8.804, 8.427, 8.177, 7.615, 7.259, 6.887, 6.914, 5.937, 6.029, 5.082], "rebounds": [1.7, 3.285, 3.374, 3.427, 3.346, 3.163, 3.228, 3.482, 3.791, 3.834, 3.965, 3.952, 3.848, 3.767, 3.608, 3.61, 3.487, 3.476, 3.266, 3.254, 3.012, 3.0, 2.835], "assists": [0.2, 1.385, 1.562, 1.538, 1.567, 1.473, 1.584, 1.712, 1.921, 2.042, 2.073, 2.12, 2.122, 2.086, 2.089, 1.992, 1.984, 1.973, 1.949, 2.011, 1.805, 1.925, 1.812], "late_bloomers": [{"player": "LeBron James", "avg_pts": 26.87}, {"player": "Kobe Bryant", "avg_pts": 19.95}, {"player": "Dirk Nowitzki", "avg_pts": 18.65}, {"player": "Paul Pierce", "avg_pts": 18.6}, {"player": "Antawn Jamison", "avg_pts": 17.6}, {"player": "Shaquille O'Neal", "avg_pts": 17.55}, {"player": "Kyle Lowry", "avg_pts": 17.2}, {"player": "Sam Cassell", "avg_pts": 17.2}, {"player": "Chris Paul", "avg_pts": 17.0}, {"player": "JJ Redick", "avg_pts": 16.7}, {"player": "Dwyane Wade", "avg_pts": 16.65}, {"player": "Ray Allen", "avg_pts": 16.5}]}, "scoring_trends": {"season_year": [2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], "avg_pts": [7.983, 8.209, 8.267, 8.504, 8.572, 8.206, 7.929, 7.958, 8.09, 8.123, 8.349, 8.427, 8.16, 8.614, 8.726, 8.942, 8.24], "top_scorer": {"season_year": [2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], "avg_pts": [35.4, 31.6, 30.0, 30.2, 30.1, 27.7, 28.0, 28.7, 32.0, 28.1, 30.1, 31.6, 30.4, 36.1, 34.3, 32.0, 30.6], "player": ["Kobe Bryant", "Kobe Bryant", "LeBron James", "Dwyane Wade", "Kevin Durant", "Kevin Durant", "Kevin Durant", "Carmelo Anthony", "Kevin Durant", "Russell Westbrook", "Stephen Curry", "Russell Westbrook", "James Harden", "James Harden", "James Harden", "Stephen Curry", "Joel Embiid"]}, "most_seasons_top_scorer": [{"player": "Kevin Durant", "n": 4}, {"player": "James Harden", "n": 3}, {"player": "Kobe Bryant", "n": 2}, {"player": "Russell Westbrook", "n": 2}]}, "rookie_impact": {"stages": ["Rookie", "Prime (1-6 yrs)", "Veteran (7+ yrs)"], "points": [5.706, 9.505, 9.829], "rebounds": [2.591, 3.95, 4.135], "assists": [1.201, 1.964, 2.27], "top_rookies": [{"player": "Zion Williamson", "pts": 22.5}, {"player": "Luka Doncic", "pts": 21.2}, {"player": "Donovan Mitchell", "pts": 20.5}, {"player": "Kevin Durant", "pts": 20.3}, {"player": "Tyreke Evans", "pts": 20.1}, {"player": "Anthony Edwards", "pts": 19.3}, {"player": "Trae Young", "pts": 19.1}, {"player": "Damian Lillard", "pts": 19.0}]}, "positional": {"positions": ["Guard", "Forward", "Center"], "points": [8.808, 8.062, 8.093], "rebounds": [2.338, 3.774, 5.39], "assists": [2.82, 1.387, 1.112], "trend": {"Guard": {"season_year": [2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], "avg_pts": [8.467, 8.504, 8.419, 8.9, 8.943, 8.853, 8.847, 8.714, 8.645, 8.944, 9.452, 9.562, 8.851, 8.921, 8.79, 9.198, 8.07]}, "Forward": {"season_year": [2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], "avg_pts": [8.0, 8.325, 8.706, 8.592, 8.658, 8.284, 7.617, 7.64, 7.784, 7.54, 7.607, 7.712, 7.569, 8.168, 8.368, 8.562, 8.125]}, "Center": {"season_year": [2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], "avg_pts": [7.14, 7.342, 6.854, 7.631, 7.723, 7.03, 7.247, 7.558, 7.952, 8.404, 8.607, 8.442, 8.645, 9.377, 9.961, 9.615, 9.558]}}}, "efficiency": {"season_year": [2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], "avg_net": [-1.317, -1.263, -1.065, -1.108, -1.168, -1.183, -1.14, -0.974, -1.356, -1.494, -0.854, -1.067, -1.081, -1.09, -0.737, -1.16, -0.898], "top_net_rating": [{"player": "Kawhi Leonard", "avg_net": 10.23}, {"player": "Manu Ginobili", "avg_net": 10.12}, {"player": "Tim Duncan", "avg_net": 9.05}, {"player": "Stephen Curry", "avg_net": 9.0}, {"player": "Draymond Green", "avg_net": 8.03}, {"player": "Klay Thompson", "avg_net": 7.82}, {"player": "LeBron James", "avg_net": 7.53}, {"player": "Chris Paul", "avg_net": 7.41}]}, "international": {"season_year": [2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021], "pct_intl": [0.1747, 0.155, 0.1552, 0.1573, 0.1697, 0.1836, 0.1736, 0.1812, 0.1909, 0.2053, 0.2122, 0.2366, 0.2111, 0.2226, 0.2363, 0.2296, 0.2198], "country_counts": [{"country": "France", "n": 162}, {"country": "Canada", "n": 156}, {"country": "Australia", "n": 89}, {"country": "Spain", "n": 82}, {"country": "Brazil", "n": 78}], "top_scorers": [{"player": "Joel Embiid", "country": "Cameroon", "abbr": "CMR", "avg_pts": 25.4}, {"player": "Kyrie Irving", "country": "Australia", "abbr": "AUS", "avg_pts": 23.5}, {"player": "Giannis Antetokounmpo", "country": "Greece", "abbr": "GRE", "avg_pts": 22.4}, {"player": "Dirk Nowitzki", "country": "Germany", "abbr": "GER", "avg_pts": 19.9}, {"player": "Nikola Jokic", "country": "Serbia", "abbr": "SRB", "avg_pts": 19.8}]}};
 
-const dollar = v => '$' + Number(v).toLocaleString('en-US', {maximumFractionDigits: 0});
+const FONT = "'Source Sans 3', sans-serif";
+const COLORS = { Guard:"#1d7ab5", Forward:"#e07b39", Center:"#3aaa6e" };
+const BASE_LAYOUT = {
+  font:{family:FONT, size:12, color:"#20242c"},
+  margin:{l:48,r:16,t:8,b:36},
+  paper_bgcolor:"rgba(0,0,0,0)",
+  plot_bgcolor:"rgba(0,0,0,0)",
+  hoverlabel:{font:{family:FONT}}
+};
+const CFG = {displayModeBar:false, responsive:true};
 
-function mkBox(id, labels, arrays, colors) {
-  new Chart(document.getElementById(id), {
-    type: 'boxplot',
-    data: {
-      labels,
-      datasets: [{
-        data: arrays,
-        backgroundColor: colors.map(c => c + '66'),
-        borderColor: colors,
-        borderWidth: 2,
-        medianColor: '#111',
-        outlierBackgroundColor: colors,
-        outlierRadius: 4,
-        itemRadius: 0,
-        barPercentage: 0.55,
-        categoryPercentage: 0.75
-      }]
-    },
-    options: {
-      responsive: true,
-      animation: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: '#eee' }, ticks: { color: '#555', font: { size: 12 } } },
-        y: { grid: { color: '#eee' }, ticks: { color: '#555', font: { size: 11 }, callback: dollar } }
-      }
-    }
-  });
-}
+function grid(axis){ return {gridcolor:"#e7e3d6", zeroline:false}; }
 
-function lrLine(pts) {
-  const n = pts.length;
-  const mx = pts.reduce((a, p) => a + p[0], 0) / n;
-  const my = pts.reduce((a, p) => a + p[1], 0) / n;
-  const m = pts.reduce((a, p) => a + (p[0]-mx)*(p[1]-my), 0) / pts.reduce((a, p) => a + (p[0]-mx)**2, 0);
-  const xs = pts.map(p => p[0]);
-  return [
-    { x: Math.min(...xs), y: m*Math.min(...xs) + (my - m*mx) },
-    { x: Math.max(...xs), y: m*Math.max(...xs) + (my - m*mx) }
+/* ---------- Scoreboard ---------- */
+(function(){
+  const cl = DATA.career_longevity;
+  const totalPlayers = Object.values(cl.hist).reduce((a,h)=>a+h.y.reduce((x,y)=>x+y,0),0);
+  const avgCareer = (Object.values(cl.avg_by_position).reduce((a,p)=>a+p.mean,0)/3).toFixed(1);
+  const stats = [
+    {num:"2005\u201321", lbl:"Seasons Covered"},
+    {num:totalPlayers.toLocaleString(), lbl:"Unique Players"},
+    {num:avgCareer, lbl:"Avg Career (yrs)"},
+    {num: DATA.efficiency.top_net_rating[0].player.split(' ').pop(), lbl:"Top Net Rating"},
+    {num: (DATA.international.pct_intl[DATA.international.pct_intl.length-1]*100).toFixed(0)+"%", lbl:"Int'l Players, 2021"}
   ];
-}
-
-// C1 — Membership box plot
-mkBox('c1', ['Bronze','Gold','Silver'], [D.mem.Bronze, D.mem.Gold, D.mem.Silver], ['#7B5EA7','#2A9D8F','#E9C46A']);
-
-// C2 — Age group box plot
-mkBox('c2', ['26-29','30-33','34-37','38-43'], [D.age['26-29'], D.age['30-33'], D.age['34-37'], D.age['38-43']], ['#3949AB','#8E24AA','#F4845F','#E9C46A']);
-
-// C3 — Items vs Spend scatter
-(()=>{
-  const pts = D.items_spend.map(p => ({x: p[0], y: p[1]}));
-  const line = lrLine(D.items_spend);
-  new Chart(document.getElementById('c3'), {
-    type: 'scatter',
-    data: { datasets: [
-      { data: pts, pointRadius: 4, pointBackgroundColor: 'rgba(33,150,243,0.4)', pointBorderWidth: 0 },
-      { data: line, type: 'line', borderColor: '#E91E63', borderWidth: 2.5, pointRadius: 0, fill: false }
-    ]},
-    options: {
-      responsive: true, animation: false,
-      plugins: { legend: { display: false },
-        annotation: { annotations: { label1: { type:'label', xValue:19, yValue:400, content:['r = 0.972'], font:{size:14,weight:'bold'}, color:'#444' } } }
-      },
-      scales: {
-        x: { title:{display:true,text:'Number of Items Purchased',color:'#555',font:{size:12}}, grid:{color:'#eee'}, ticks:{color:'#555'} },
-        y: { title:{display:true,text:'Total Spend ($)',color:'#555',font:{size:12}}, grid:{color:'#eee'}, ticks:{color:'#555',callback:dollar} }
-      }
-    }
-  });
+  document.getElementById('scoreboard').innerHTML = stats.map(s=>
+    `<div class="stat-cell"><div class="num">${s.num}</div><div class="lbl">${s.lbl}</div></div>`
+  ).join('');
 })();
 
-// C4 — City Ratings bar
-(()=>{
-  const entries = Object.entries(D.city_ratings).sort((a,b) => b[1]-a[1]);
-  const vals = entries.map(e => e[1]);
-  const colors = vals.map(v => { const t=(v-3)/2; return `rgb(${Math.round(255*(1-t)+76*t)},${Math.round(193*(1-t)+175*t)},${Math.round(7*(1-t)+74*t)})`; });
-  new Chart(document.getElementById('c4'), {
-    type: 'bar',
-    data: { labels: entries.map(e => e[0]), datasets: [{ data: vals, backgroundColor: colors, borderRadius: 3 }] },
-    options: {
-      indexAxis: 'y', responsive: true, animation: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { min:0, max:5, grid:{color:'#eee'}, ticks:{color:'#555',font:{size:12}} },
-        y: { grid:{display:false}, ticks:{color:'#555',font:{size:12}} }
-      }
-    }
+/* ---------- 1. Career Longevity ---------- */
+(function(){
+  const cl = DATA.career_longevity;
+  ['Guard','Forward','Center'].forEach((pos,i)=>{
+    const h = cl.hist[pos];
+    Plotly.newPlot('p1-hist-'+pos.toLowerCase(), [{
+      x:h.x, y:h.y, type:'bar',
+      marker:{color:COLORS[pos]},
+      hovertemplate: pos+': %{x} seasons, %{y} players<extra></extra>'
+    }], Object.assign({}, BASE_LAYOUT, {
+      height:110,
+      margin:{l:36,r:10,t:4,b:22},
+      xaxis:Object.assign({title:i===2?'Career Length (seasons)':''}, grid()),
+      yaxis:Object.assign({title:'Players', titlefont:{size:10}}, grid())
+    }), CFG);
   });
+
+  const positions = Object.keys(cl.avg_by_position);
+  Plotly.newPlot('p1-avg', [{
+    x:positions, y:positions.map(p=>cl.avg_by_position[p].mean),
+    error_y:{type:'data', array:positions.map(p=>cl.avg_by_position[p].se), color:'#333'},
+    type:'bar', marker:{color:positions.map(p=>COLORS[p])}
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:220, xaxis:grid(), yaxis:Object.assign({title:'Avg Seasons'}, grid())
+  }), CFG);
+
+  const longest = cl.longest_careers.slice().reverse();
+  Plotly.newPlot('p1-longest', [{
+    x:longest.map(d=>d.seasons), y:longest.map(d=>d.player),
+    orientation:'h', type:'bar',
+    marker:{color:longest.map(d=>COLORS[d.position])},
+    hovertemplate:'%{y}: %{x} seasons<extra></extra>'
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:340, margin:{l:140,r:16,t:4,b:34},
+    xaxis:Object.assign({title:'Seasons Played'}, grid()), yaxis:{automargin:true}
+  }), CFG);
 })();
 
-// C5 — Days vs Spend scatter
-(()=>{
-  const pts = D.days_spend.map(p => ({x: p[0], y: p[1]}));
-  const line = lrLine(D.days_spend);
-  new Chart(document.getElementById('c5'), {
-    type: 'scatter',
-    data: { datasets: [
-      { data: pts, pointRadius: 4, pointBackgroundColor: 'rgba(156,39,176,0.35)', pointBorderWidth: 0 },
-      { data: line, type: 'line', borderColor: '#FF5722', borderWidth: 2.5, pointRadius: 0, fill: false }
-    ]},
-    options: {
-      responsive: true, animation: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { title:{display:true,text:'Days Since Last Purchase',color:'#555',font:{size:12}}, grid:{color:'#eee'}, ticks:{color:'#555'} },
-        y: { title:{display:true,text:'Total Spend ($)',color:'#555',font:{size:12}}, grid:{color:'#eee'}, ticks:{color:'#555',callback:dollar} }
-      }
-    }
-  });
+/* ---------- 2. Age & Performance ---------- */
+(function(){
+  const a = DATA.age_performance;
+  Plotly.newPlot('p2-age', [
+    {x:a.age, y:a.points, name:'Points', mode:'lines+markers', line:{color:'#e05c2a', width:3}, marker:{size:5}},
+    {x:a.age, y:a.rebounds, name:'Rebounds', mode:'lines+markers', line:{color:'#2a7ae0', width:3}, marker:{size:5}},
+    {x:a.age, y:a.assists, name:'Assists', mode:'lines+markers', line:{color:'#2aad5a', width:3}, marker:{size:5}}
+  ], Object.assign({}, BASE_LAYOUT, {
+    height:300, margin:{l:48,r:16,t:8,b:36},
+    xaxis:Object.assign({title:'Age'}, grid()),
+    yaxis:Object.assign({title:'Avg per Game'}, grid()),
+    legend:{orientation:'h', y:1.15}
+  }), CFG);
+
+  const lb = a.late_bloomers.slice().reverse();
+  Plotly.newPlot('p2-late', [{
+    x:lb.map(d=>d.avg_pts), y:lb.map(d=>d.player),
+    orientation:'h', type:'bar',
+    marker:{color:lb.map(d=>d.avg_pts), colorscale:[[0,'#f5c97a'],[1,'#c0392b']]},
+    hovertemplate:'%{y}: %{x} pts/g<extra></extra>'
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:320, margin:{l:130,r:16,t:4,b:34},
+    xaxis:Object.assign({title:'Avg Points per Game'}, grid()), yaxis:{automargin:true}
+  }), CFG);
 })();
 
-// C6 — Discount box plot
-mkBox('c6', ['No Discount','Discount Applied'], [D.disc['False'], D.disc['True']], ['#EF9A9A','#80CBC4']);
+/* ---------- 3. Scoring Trends ---------- */
+(function(){
+  const s = DATA.scoring_trends;
+  Plotly.newPlot('p3-league', [{
+    x:s.season_year, y:s.avg_pts, mode:'lines', line:{color:'#555', width:2.5}
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:200, xaxis:Object.assign({title:'Season Start Year', dtick:5}, grid()),
+    yaxis:Object.assign({title:'Avg Pts/Game'}, grid())
+  }), CFG);
 
-// C7 — Age histogram
-(()=>{
-  const ages = Array.from({length:18}, (_,i) => i+26);
-  const colors = {Bronze:'#7B5EA7', Gold:'#2A9D8F', Silver:'#E9C46A'};
-  new Chart(document.getElementById('c7'), {
-    type: 'bar',
-    data: {
-      labels: ages,
-      datasets: Object.entries(D.age_mem).map(([m, vals]) => ({
-        label: m,
-        data: ages.map(a => vals.filter(v => v===a).length),
-        backgroundColor: colors[m] + 'bb',
-        borderColor: colors[m],
-        borderWidth: 1,
-        borderRadius: 2
-      }))
-    },
-    options: {
-      responsive: true, animation: false,
-      plugins: { legend: { display:true, position:'bottom', labels:{font:{size:12}} } },
-      scales: {
-        x: { grid:{color:'#eee'}, ticks:{color:'#555',font:{size:10}} },
-        y: { grid:{color:'#eee'}, ticks:{color:'#555'}, title:{display:true,text:'Count',color:'#555'} }
-      }
-    }
-  });
+  const ts = s.top_scorer;
+  Plotly.newPlot('p3-topscorer', [{
+    x:ts.season_year, y:ts.avg_pts, mode:'lines+markers+text',
+    text:ts.player.map((p,i)=> (ts.season_year[i]%3===0 || ts.avg_pts[i]===Math.max(...ts.avg_pts)) ? p : ''),
+    textposition:'top center', textfont:{size:9},
+    line:{color:'#e07b39', width:2},
+    marker:{size:8, color:ts.avg_pts, colorscale:[[0,'#f5c97a'],[1,'#c0392b']]},
+    hovertemplate:'%{text}: %{y} pts/g (%{x})<extra></extra>'
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:260, margin:{l:48,r:16,t:24,b:36},
+    xaxis:Object.assign({title:'Season Start Year', dtick:5}, grid()),
+    yaxis:Object.assign({title:'Points per Game'}, grid())
+  }), CFG);
+
+  const mc = s.most_seasons_top_scorer.slice().reverse();
+  Plotly.newPlot('p3-count', [{
+    x:mc.map(d=>d.n), y:mc.map(d=>d.player), orientation:'h', type:'bar',
+    marker:{color:mc.map(d=>d.n), colorscale:[[0,'#f5c97a'],[1,'#c0392b']]},
+    text:mc.map(d=>d.n), textposition:'outside'
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:180, margin:{l:140,r:24,t:4,b:34},
+    xaxis:Object.assign({title:'# Seasons as Top Scorer'}, grid()), yaxis:{automargin:true}
+  }), CFG);
 })();
 
-// C8 — Satisfaction vs Spend scatter
-(()=>{
-  const pts = D.sat_spend.map(p => ({x: p[0]+(Math.random()-.5)*.12, y: p[1]}));
-  const line = lrLine(D.sat_spend);
-  new Chart(document.getElementById('c8'), {
-    type: 'scatter',
-    data: { datasets: [
-      { data: pts, pointRadius: 4, pointBackgroundColor: 'rgba(126,87,194,0.4)', pointBorderWidth: 0 },
-      { data: line, type: 'line', borderColor: '#E91E63', borderWidth: 2.5, pointRadius: 0, fill: false }
-    ]},
-    options: {
-      responsive: true, animation: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { min:.5, max:3.5, ticks:{color:'#555',font:{size:12},callback:v=>({1:'Unsatisfied',2:'Neutral',3:'Satisfied'}[v]||'')}, grid:{color:'#eee'}, title:{display:true,text:'Satisfaction Level',color:'#555',font:{size:12}} },
-        y: { grid:{color:'#eee'}, ticks:{color:'#555',callback:dollar}, title:{display:true,text:'Total Spend ($)',color:'#555',font:{size:12}} }
-      }
-    }
+/* ---------- 4. Rookie Impact ---------- */
+(function(){
+  const r = DATA.rookie_impact;
+  const metrics = [['Assists', r.assists], ['Points', r.points], ['Rebounds', r.rebounds]];
+  const stageColors = {'Rookie':'#3aaa6e','Prime (1-6 yrs)':'#e07b39','Veteran (7+ yrs)':'#1d7ab5'};
+  const traces = [];
+  metrics.forEach(([name, vals], i)=>{
+    traces.push({
+      x:r.stages, y:vals, type:'bar',
+      marker:{color:r.stages.map(s=>stageColors[s])},
+      xaxis:'x'+(i+1), yaxis:'y'+(i+1),
+      showlegend:false, name:name,
+      hovertemplate: name+' &mdash; %{x}: %{y:.2f}<extra></extra>'
+    });
   });
+  const layout4 = Object.assign({}, BASE_LAYOUT, {
+    height:230,
+    margin:{l:44,r:10,t:24,b:50},
+    grid:{rows:1, columns:3, pattern:'independent'},
+    annotations:[
+      {text:'Assists', x:0.14, y:1.12, xref:'paper', yref:'paper', showarrow:false, font:{family:FONT, size:12}},
+      {text:'Points', x:0.5, y:1.12, xref:'paper', yref:'paper', showarrow:false, font:{family:FONT, size:12}},
+      {text:'Rebounds', x:0.86, y:1.12, xref:'paper', yref:'paper', showarrow:false, font:{family:FONT, size:12}}
+    ]
+  });
+  ['xaxis','xaxis2','xaxis3'].forEach(k=> layout4[k]=Object.assign({tickangle:-20}, grid()));
+  ['yaxis','yaxis2','yaxis3'].forEach(k=> layout4[k]=grid());
+  Plotly.newPlot('p4-stage', traces, layout4, CFG);
+
+  const tr = r.top_rookies.slice().reverse();
+  Plotly.newPlot('p4-rookies', [{
+    x:tr.map(d=>d.pts), y:tr.map(d=>d.player), orientation:'h', type:'bar',
+    marker:{color:tr.map(d=>d.pts), colorscale:[[0,'#a8f0c8'],[1,'#1a7a4a']]}
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:260, margin:{l:130,r:16,t:4,b:34},
+    xaxis:Object.assign({title:'Points per Game'}, grid()), yaxis:{automargin:true}
+  }), CFG);
 })();
 
-// C9 — Gender box plot
-mkBox('c9', ['Female','Male'], [D.gen.Female, D.gen.Male], ['#EC407A','#42A5F5']);
-
-// C10 — Items by City box plot
-(()=>{
-  const cityOrder = ['Houston','Chicago','Los Angeles','Miami','New York','San Francisco'];
-  const colors = ['#3B4F7A','#4A5EA0','#9E9E9E','#A8956A','#C4A94A','#E9C46A'];
-  new Chart(document.getElementById('c10'), {
-    type: 'boxplot',
-    data: {
-      labels: cityOrder,
-      datasets: [{
-        data: cityOrder.map(c => D.city_items[c]),
-        backgroundColor: colors.map(c => c + '66'),
-        borderColor: colors,
-        borderWidth: 2,
-        medianColor: '#111',
-        outlierRadius: 4,
-        itemRadius: 0,
-        barPercentage: 0.55,
-        categoryPercentage: 0.75
-      }]
-    },
-    options: {
-      responsive: true, animation: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid:{color:'#eee'}, ticks:{color:'#555',font:{size:11}} },
-        y: { grid:{color:'#eee'}, ticks:{color:'#555',font:{size:11}} }
-      }
-    }
+/* ---------- 5. Positional Analysis ---------- */
+(function(){
+  const p = DATA.positional;
+  const metrics = [['Assists', p.assists], ['Points', p.points], ['Rebounds', p.rebounds]];
+  const traces = [];
+  metrics.forEach(([name, vals], i)=>{
+    traces.push({
+      x:p.positions, y:vals, type:'bar',
+      marker:{color:p.positions.map(pos=>COLORS[pos])},
+      xaxis:'x'+(i+1), yaxis:'y'+(i+1), showlegend:false, name:name,
+      hovertemplate:name+' &mdash; %{x}: %{y:.2f}<extra></extra>'
+    });
   });
+  const layout5 = Object.assign({}, BASE_LAYOUT, {
+    height:220, margin:{l:44,r:10,t:24,b:34},
+    grid:{rows:1, columns:3, pattern:'independent'},
+    annotations:[
+      {text:'Assists', x:0.14, y:1.12, xref:'paper', yref:'paper', showarrow:false, font:{family:FONT, size:12}},
+      {text:'Points', x:0.5, y:1.12, xref:'paper', yref:'paper', showarrow:false, font:{family:FONT, size:12}},
+      {text:'Rebounds', x:0.86, y:1.12, xref:'paper', yref:'paper', showarrow:false, font:{family:FONT, size:12}}
+    ]
+  });
+  ['xaxis','xaxis2','xaxis3'].forEach(k=> layout5[k]=grid());
+  ['yaxis','yaxis2','yaxis3'].forEach(k=> layout5[k]=grid());
+  Plotly.newPlot('p5-overall', traces, layout5, CFG);
+
+  const tr = p.trend;
+  Plotly.newPlot('p5-trend', ['Guard','Forward','Center'].map(pos=>({
+    x:tr[pos].season_year, y:tr[pos].avg_pts, mode:'lines', name:pos,
+    line:{color:COLORS[pos], width:2.5}
+  })), Object.assign({}, BASE_LAYOUT, {
+    height:260, xaxis:Object.assign({title:'Season Start Year', dtick:5}, grid()),
+    yaxis:Object.assign({title:'Avg Points per Game'}, grid()),
+    legend:{orientation:'h', y:1.15}
+  }), CFG);
+})();
+
+/* ---------- 6. Player Efficiency ---------- */
+(function(){
+  const e = DATA.efficiency;
+  Plotly.newPlot('p6-league', [{
+    x:e.season_year, y:e.avg_net, mode:'lines', line:{color:'#1d7ab5', width:2.5}
+  }, {
+    x:[Math.min(...e.season_year), Math.max(...e.season_year)], y:[0,0],
+    mode:'lines', line:{color:'#999', width:1, dash:'dash'}, hoverinfo:'skip', showlegend:false
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:220, showlegend:false,
+    xaxis:Object.assign({title:'Season Start Year', dtick:5}, grid()),
+    yaxis:Object.assign({title:'Avg Net Rating'}, grid())
+  }), CFG);
+
+  const top = e.top_net_rating.slice().reverse();
+  Plotly.newPlot('p6-top', [{
+    x:top.map(d=>d.avg_net), y:top.map(d=>d.player), orientation:'h', type:'bar',
+    marker:{color:top.map(d=>d.avg_net), colorscale:[[0,'#a8d8f0'],[1,'#1565c0']]}
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:280, margin:{l:130,r:16,t:4,b:34},
+    xaxis:Object.assign({title:'Avg Net Rating'}, grid()), yaxis:{automargin:true}
+  }), CFG);
+})();
+
+/* ---------- 7. International Impact ---------- */
+(function(){
+  const it = DATA.international;
+  Plotly.newPlot('p7-pct', [{
+    x:it.season_year, y:it.pct_intl.map(v=>v*100),
+    mode:'lines', fill:'tozeroy',
+    line:{color:'#1d7ab5', width:2.5}, fillcolor:'rgba(29,122,181,0.18)',
+    hovertemplate:'%{x}: %{y:.1f}%<extra></extra>'
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:220, xaxis:Object.assign({title:'Season Start Year', dtick:5}, grid()),
+    yaxis:Object.assign({title:'% International', ticksuffix:'%'}, grid())
+  }), CFG);
+
+  const cc = it.country_counts.slice().reverse();
+  Plotly.newPlot('p7-country', [{
+    x:cc.map(d=>d.n), y:cc.map(d=>d.country), orientation:'h', type:'bar',
+    marker:{color:cc.map(d=>d.n), colorscale:[[0,'#a8d8f0'],[1,'#0d47a1']]}
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:220, margin:{l:80,r:16,t:4,b:34},
+    xaxis:Object.assign({title:'Player-Seasons'}, grid()), yaxis:{automargin:true}
+  }), CFG);
+
+  const sc = it.top_scorers.slice().reverse();
+  Plotly.newPlot('p7-scorers', [{
+    x:sc.map(d=>d.avg_pts), y:sc.map(d=>d.player+' ('+d.abbr+')'), orientation:'h', type:'bar',
+    marker:{color:'#1565c0'}
+  }], Object.assign({}, BASE_LAYOUT, {
+    height:220, margin:{l:170,r:16,t:4,b:34},
+    xaxis:Object.assign({title:'Avg Points per Game'}, grid()), yaxis:{automargin:true}
+  }), CFG);
 })();
 </script>
 </body>
